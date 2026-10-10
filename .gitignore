@@ -1,0 +1,33 @@
+# Node / frontend (Vite + React)
+node_modules/
+dist/
+dist-ssr/
+*.local
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Java / Maven backend
+target/
+*.class
+!.mvn/wrapper/maven-wrapper.jar
+
+# Firebase secrets + emulator output
+.env
+.env.*
+!.env.example
+.firebase/
+firebase-debug.log
+*.service_account.json
+
+# Logs
+*.log
+logs/
+
+# IDE / OS
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
