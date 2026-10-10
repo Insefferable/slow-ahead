@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: battleship-backend
+server:
+  port: 8080
