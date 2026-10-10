@@ -48,4 +48,8 @@ public class ComputerPlayer {
         shotStrategy.recordResult(result);
         return result;
     }
+
+    public void observe(AttackResult result) {
+        shotStrategy.recordResult(result);
+    }
 }
