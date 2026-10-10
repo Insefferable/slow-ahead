@@ -3,10 +3,13 @@ package com.slowahead.battleship.game.domain;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
+import com.slowahead.battleship.game.exception.InvalidAttackException;
 import com.slowahead.battleship.game.exception.InvalidPlacementException;
 
 public final class Board {
@@ -16,6 +19,7 @@ public final class Board {
     private final int size;
     private final List<Ship> ships = new ArrayList<>();
     private final Map<Coordinate, Ship> occupancy = new HashMap<>();
+    private final Set<Coordinate> shots = new HashSet<>();
 
     public Board() {
         this(DEFAULT_SIZE);
@@ -31,6 +35,10 @@ public final class Board {
 
     public List<Ship> getShips() {
         return Collections.unmodifiableList(ships);
+    }
+
+    public Set<Coordinate> getShots() {
+        return Collections.unmodifiableSet(shots);
     }
 
     public boolean isWithinBounds(Coordinate coordinate) {
@@ -61,7 +69,50 @@ public final class Board {
         return Optional.ofNullable(occupancy.get(coordinate));
     }
 
+    public boolean isAttacked(Coordinate coordinate) {
+        return shots.contains(coordinate);
+    }
+
+    public boolean allShipsSunk() {
+        if (ships.isEmpty()) {
+            return false;
+        }
+        for (Ship ship : ships) {
+            if (!ship.isSunk()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public AttackResult attack(Coordinate coordinate) {
+        if (!isWithinBounds(coordinate)) {
+            throw new InvalidAttackException("Coordinate " + coordinate + " is outside the board");
+        }
+        if (shots.contains(coordinate)) {
+            throw new InvalidAttackException("Coordinate " + coordinate + " has already been attacked");
+        }
+        shots.add(coordinate);
+
+        Optional<Ship> target = shipAt(coordinate);
+        if (!target.isPresent()) {
+            return new AttackResult(coordinate, AttackOutcome.MISS, null);
+        }
+
+        Ship ship = target.get();
+        ship.registerHit(coordinate);
+        if (ship.isSunk()) {
+            return new AttackResult(coordinate, AttackOutcome.SUNK, ship.getType());
+        }
+        return new AttackResult(coordinate, AttackOutcome.HIT, null);
+    }
+
     public CellState cellState(Coordinate coordinate) {
-        return occupancy.containsKey(coordinate) ? CellState.SHIP : CellState.EMPTY;
+        boolean occupied = occupancy.containsKey(coordinate);
+        boolean attacked = shots.contains(coordinate);
+        if (occupied) {
+            return attacked ? CellState.HIT : CellState.SHIP;
+        }
+        return attacked ? CellState.MISS : CellState.EMPTY;
     }
 }
