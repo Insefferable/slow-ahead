@@ -16,14 +16,27 @@ public final class GameSession {
     private final String id;
     private final Game game;
     private final ComputerPlayer computerPlayer;
-    private final List<Move> moves = new ArrayList<>();
-    private final Instant createdAt = Instant.now();
-    private Instant updatedAt = Instant.now();
+    private final List<Move> moves;
+    private final Instant createdAt;
+    private Instant updatedAt;
 
     public GameSession(String id, Game game, ComputerPlayer computerPlayer) {
+        this(id, game, computerPlayer, Collections.<Move>emptyList(), Instant.now(), Instant.now());
+    }
+
+    public static GameSession restore(String id, Game game, ComputerPlayer computerPlayer,
+                                      List<Move> moves, Instant createdAt, Instant updatedAt) {
+        return new GameSession(id, game, computerPlayer, moves, createdAt, updatedAt);
+    }
+
+    private GameSession(String id, Game game, ComputerPlayer computerPlayer,
+                        List<Move> moves, Instant createdAt, Instant updatedAt) {
         this.id = Objects.requireNonNull(id, "id");
         this.game = Objects.requireNonNull(game, "game");
         this.computerPlayer = Objects.requireNonNull(computerPlayer, "computerPlayer");
+        this.moves = new ArrayList<>(Objects.requireNonNull(moves, "moves"));
+        this.createdAt = Objects.requireNonNull(createdAt, "createdAt");
+        this.updatedAt = Objects.requireNonNull(updatedAt, "updatedAt");
     }
 
     public String getId() {
