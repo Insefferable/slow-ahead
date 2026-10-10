@@ -3,3 +3,8 @@ spring:
     name: battleship-backend
 server:
   port: 8080
+
+firebase:
+  enabled: ${FIREBASE_ENABLED:false}
+  project-id: ${FIREBASE_PROJECT_ID:}
+  credentials-path: ${GOOGLE_APPLICATION_CREDENTIALS:}
