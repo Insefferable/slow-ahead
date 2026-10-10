@@ -6,6 +6,7 @@ import com.slowahead.battleship.game.exception.GameNotFoundException;
 import com.slowahead.battleship.game.exception.GameOverException;
 import com.slowahead.battleship.game.exception.InvalidAttackException;
 import com.slowahead.battleship.game.exception.InvalidPlacementException;
+import com.slowahead.battleship.game.exception.PersistenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -36,6 +37,11 @@ public class RestExceptionHandler {
                 .map(error -> error.getField() + " " + error.getDefaultMessage())
                 .collect(Collectors.joining(", "));
         return build(HttpStatus.BAD_REQUEST, message.isEmpty() ? "Invalid request" : message);
+    }
+
+    @ExceptionHandler(PersistenceException.class)
+    public ResponseEntity<ApiError> handlePersistence(PersistenceException exception) {
+        return build(HttpStatus.SERVICE_UNAVAILABLE, exception.getMessage());
     }
 
     private ResponseEntity<ApiError> build(HttpStatus status, String message) {
